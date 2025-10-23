@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "adc.h": "c",
+        "config.h": "c",
+        "motores.h": "c",
+        "fc03.h": "c"
+    }
+}
