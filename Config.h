@@ -31,12 +31,25 @@ extern float TR, TI, UR, UI, SR, SI;
 // CONFIGURACIONES DEL FC-03
 // =============================
 #define PULSOS_POR_REV 20
-#define RADIO_RUEDA 0.063f // metros
+#define RADIO_RUEDA 0.063f  
 
-extern volatile uint16_t contador_izq;
-extern volatile uint16_t contador_der;
-extern volatile float velocidad_izq;
-extern volatile float velocidad_der;
+volatile uint16_t contador_izq;       // Conteo total de pulsos
+volatile uint16_t contador_der;
+extern float velocidad_izq;
+extern float velocidad_der;
+// =============================
+// CONFIGURACIONES MOTORES
+// =============================
 
+// Mapeo de pines 
+#define D1_PIN PB7   // Arduino pin 13  (Motor A ) (Naranja)
+#define D2_PIN PB6   // Arduino pin 12  (Motor B ) (Amarillo)
+#define D3_PIN PB5   // Arduino pin 11  (Motor B ) (Verde)
+#define VT_PIN PB4   // Pin 10 del Arduino Mega    (Azul)
+#define D0_PIN PH6   // Arduino pin 9  (Motor A )  (Gris)
+
+// Movimiento recto
+#define TIEMPO_MUESTREO 1.0f 
+#define K_CORRECCION 10.0
 
 #endif

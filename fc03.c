@@ -6,50 +6,54 @@
 #include "config.h"
 #include "fc03.h"
 
-
-// =============================
-// INTERRUPCIÓN EXTERNA INT0
-// =============================
-ISR(INT0_vect) {
-    contador_izq++; // Cada flanco de subida cuenta un pulso
-}
-// =====================
-// ISR ENCODER DER (INT1)
-// =====================
-ISR(INT1_vect) {
+// ==========================
+// ISR – Interrupciones externas
+// ==========================
+ISR(INT2_vect) {  // Pin 19 → Derecha
     contador_der++;
 }
 
-// =============================
-// TIMER1 COMPARE MATCH ISR
-// =============================
-ISR(TIMER1_COMPA_vect) {
-     float rev_izq = (float)contador_izq / PULSOS_POR_REV;
+ISR(INT3_vect) {  // Pin 18 → Izquierda
+    contador_izq++;
+}
+
+// ==========================
+// Configuración de encoders
+// ==========================
+void Encoder_init(void) {
+    // INT2 e INT3 → flanco descendente
+    EICRA |= (1 << ISC21) | (1 << ISC31);
+    EICRA &= ~((1 << ISC20) | (1 << ISC30));
+
+    // Habilitar interrupciones INT2 e INT3
+    EIMSK |= (1 << INT2) | (1 << INT3);
+
+    // Pines como entrada con pull-up
+    DDRD &= ~((1 << PD2) | (1 << PD3)); // PD2=INT2, PD3=INT3
+    PORTD |= (1 << PD2) | (1 << PD3);
+}
+
+// ==========================
+// Configuración del Timer3
+// ==========================
+void Timer3_init(void) {
+    // Modo CTC
+    TCCR3B |= (1 << WGM32);
+    OCR3A = 15624; // 1 s a 16 MHz con prescaler 1024
+    TIMSK3 |= (1 << OCIE3A);
+    TCCR3B |= (1 << CS32) | (1 << CS30); // prescaler 1024
+}
+
+// ==========================
+// ISR del Timer3 (cada 1 segundo)
+// ==========================
+ISR(TIMER3_COMPA_vect) {
+    float rev_izq = (float)contador_izq / PULSOS_POR_REV;
     float rev_der = (float)contador_der / PULSOS_POR_REV;
 
-    velocidad_izq = 2 * 3.1416f * RADIO_RUEDA * rev_izq;
-    velocidad_der = 2 * 3.1416f * RADIO_RUEDA * rev_der;
+    velocidad_izq = 2.0f * 3.1416f * RADIO_RUEDA * rev_izq;
+    velocidad_der = 2.0f * 3.1416f * RADIO_RUEDA * rev_der;
 
     contador_izq = 0;
     contador_der = 0;
-}
-
-// =====================
-// CONFIGURAR ENCODERS
-// =====================
-void Encoder_init(void) {
-    // Configurar INT0 y INT1 como flanco de subida
-    EICRA |= (1 << ISC01) | (1 << ISC00); // INT0 → flanco de subida
-    EICRA |= (1 << ISC11) | (1 << ISC10); // INT1 → flanco de subida
-    EIMSK |= (1 << INT0) | (1 << INT1);   // Habilitar ambas interrupciones
-    // Habilitar interrupciones globales
-    sei();
-}
-
-void Timer1_init(void) {
-    // Timer1 modo CTC, 1 s periodo
-    TCCR1B |= (1 << WGM12);
-    OCR1A = 15624;
-    TIMSK1 |= (1 << OCIE1A);
-    TCCR1B |= (1 << CS12) | (1 << CS10); // Prescaler 1024
 }
