@@ -31,12 +31,13 @@ extern float TR, TI, UR, UI, SR, SI;
 // CONFIGURACIONES DEL FC-03
 // =============================
 #define PULSOS_POR_REV 20
-#define RADIO_RUEDA 0.063f  
+#define RADIO_RUEDA 0.0664f  
 
 volatile uint16_t contador_izq;       // Conteo total de pulsos
 volatile uint16_t contador_der;
 extern float velocidad_izq;
 extern float velocidad_der;
+volatile uint8_t flag_nueva_muestra;
 // =============================
 // CONFIGURACIONES MOTORES
 // =============================
@@ -49,7 +50,8 @@ extern float velocidad_der;
 #define D0_PIN PH6   // Arduino pin 9  (Motor A )  (Gris)
 
 // Movimiento recto
-#define TIEMPO_MUESTREO 1.0f 
-#define K_CORRECCION 10.0
+#define TIEMPO_MUESTREO 0.01f 
+#define K_CORRECCION 2.5f 
 
-#endif
+
+#endif // CONFIG_H

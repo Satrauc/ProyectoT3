@@ -14,3 +14,5 @@ void print();
 
 // Nivela los motores usando diferencial de velocidades
 void AvanzarRecto(float distancia_cm); 
+
+void RetrocederRecto(float distancia_cm);

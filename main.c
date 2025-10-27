@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <avr/interrupt.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "config.h"
 #include "uart.h"
@@ -29,6 +31,7 @@ volatile uint16_t contador_izq = 0;
 volatile uint16_t contador_der = 0;
 float velocidad_izq= 0.0f;
 float velocidad_der = 0.0f;
+volatile uint8_t flag_nueva_muestra = 0;
 /*
 int main(void){
 	char buffer[64];
@@ -61,20 +64,28 @@ int main(void){
 }
 */
 
-
 int main(void) {
     uart_init(MYUBRR);
     Encoder_init();
     Timer3_init();
+    motores_init();
     sei();
 
-    motores_init();
+     _delay_ms(1000);
+    
+   
+
+    char texto[50];
 
     while (1) {
-        
-        // ---------------- Avanzar ----------------
-        AvanzarRecto(10.0);
-        //print();
-        _delay_ms(3000);
+
+        uart_receive_string(texto, sizeof(texto));
+        if (texto[0] != '\0') {
+            AvanzarRecto(atof(texto));
+            _delay_ms(1000);
+            
+            memset(texto, 0, sizeof(texto));
+        }
+        Detener();
     }
 }

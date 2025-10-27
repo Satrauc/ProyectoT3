@@ -59,29 +59,23 @@ void Detener(void) {
     OCR1A = 0;
 }
 
-void print(){
-    char buffer[128];
-    /*snprintf(buffer, sizeof(buffer),
-                 "Izq: %u pulsos     Der: %u pulsos  \r\n",
-                 contador_izq, contador_der);*/
-    snprintf(buffer, sizeof(buffer),
-                 "Vel Derecha: %.3f m/s     Vel Izquierda: %.3f m/s  \r\n",
-                 velocidad_der,  velocidad_izq);
-
-    uart_print(buffer);
-}
-
 void AvanzarRecto(float distancia_cm) {
+    
     float distancia_obj = distancia_cm / 100.0;  // pasar a metros
     float distancia_recorrida = 0;
-    float pwm_der = 230;  // valor inicial de PWM
-    float pwm_izq = 230;
-
+    float pwm_der = 220;  // valor inicial de PWM
+    float pwm_izq = 220;
+    flag_nueva_muestra = 0;  
+    char buffer[128];
     Detener();
     _delay_ms(200);
+
     Avanzar((int)pwm_izq, (int)pwm_der);
+    //_delay_ms(200);  
 
     while (distancia_recorrida < distancia_obj) {
+        
+
         // Calcula diferencia de velocidades
         float error = velocidad_der - velocidad_izq;
 
@@ -99,6 +93,54 @@ void AvanzarRecto(float distancia_cm) {
         Avanzar((int)pwm_izq, (int)pwm_der);
 
         // Calcular distancia recorrida aproximada (promedio)
+        float vel_prom = (velocidad_der + velocidad_izq) / 2.0;
+        distancia_recorrida += vel_prom * TIEMPO_MUESTREO;
+
+        //while (!flag_nueva_muestra);  
+        //flag_nueva_muestra = 0;        // limpiar bandera
+
+        _delay_ms(5);
+        
+        snprintf(buffer, sizeof(buffer),
+                 "distancia: %.3f \n", distancia_recorrida*100);
+        uart_print(buffer);
+    }
+
+    Detener();
+}
+
+void RetrocederRecto(float distancia_cm) {
+    float distancia_obj = distancia_cm / 100.0;  // pasar a metros
+    float distancia_recorrida = 0;
+    float pwm_der = 220;  // valor inicial de PWM
+    float pwm_izq = 220;
+
+    // Asegurar que los motores estén quietos antes de arrancar
+    Detener();
+    _delay_ms(200);
+
+    // Arrancar en retroceso
+    Retroceder((int)pwm_izq, (int)pwm_der);
+    _delay_ms(200);  // Dar tiempo a que empiece el movimiento y el timer actualice velocidades
+
+    while (distancia_recorrida < distancia_obj) {
+        // Diferencia de velocidades
+        float error = velocidad_der - velocidad_izq;
+
+        // Corrección proporcional inversa
+        pwm_der -= K_CORRECCION * error;
+        pwm_izq += K_CORRECCION * error;
+
+        // Limitar valores de PWM entre 0–255
+        if (pwm_der > 255) pwm_der = 255;
+        if (pwm_der < 0) pwm_der = 0;
+        if (pwm_izq > 255) pwm_izq = 255;
+        if (pwm_izq < 0) pwm_izq = 0;
+
+        // Aplicar los nuevos valores de PWM
+        Retroceder((int)pwm_izq, (int)pwm_der);
+
+        // Calcular la distancia recorrida (en valor absoluto)
         float vel_prom = (velocidad_der + velocidad_izq) / 2.0;
         distancia_recorrida += vel_prom * TIEMPO_MUESTREO;
 

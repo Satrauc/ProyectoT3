@@ -39,7 +39,7 @@ void Encoder_init(void) {
 void Timer3_init(void) {
     // Modo CTC
     TCCR3B |= (1 << WGM32);
-    OCR3A = 15624; // 1 s a 16 MHz con prescaler 1024
+    OCR3A = 2499; // 0.01 s a 16 MHz con prescaler 1024
     TIMSK3 |= (1 << OCIE3A);
     TCCR3B |= (1 << CS32) | (1 << CS30); // prescaler 1024
 }
@@ -48,6 +48,8 @@ void Timer3_init(void) {
 // ISR del Timer3 (cada 1 segundo)
 // ==========================
 ISR(TIMER3_COMPA_vect) {
+    flag_nueva_muestra = 1;
+
     float rev_izq = (float)contador_izq / PULSOS_POR_REV;
     float rev_der = (float)contador_der / PULSOS_POR_REV;
 
