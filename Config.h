@@ -31,7 +31,9 @@ extern float TR, TI, UR, UI, SR, SI;
 // CONFIGURACIONES DEL FC-03
 // =============================
 #define PULSOS_POR_REV 20
-#define RADIO_RUEDA 0.0664f  
+#define RADIO_RUEDA 0.0664f 
+#define DISTANCIA_ENTRE_RUEDAS_M 0.098f
+
 
 volatile uint16_t contador_izq;       // Conteo total de pulsos
 volatile uint16_t contador_der;

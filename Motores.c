@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <util/delay.h>
+#include <math.h>
 #include "config.h"
 #include "uart.h"
 #include "Motores.h"
@@ -50,7 +51,6 @@ void Retroceder(uint8_t pwm_izq, uint8_t pwm_der) {
     PORTB |= (1 << D2_PIN);  // D2 = 1 (sentido atrás)
     OCR1A = pwm_der;         // PWM en PB5 (pin 11)
 }
-
 
 // Detener ambos motores
 void Detener(void) {
@@ -148,4 +148,65 @@ void RetrocederRecto(float distancia_cm) {
     }
 
     Detener();
+}
+
+void GirarSobreEje(float angulo_grados) {
+    char buffer[128];
+    // 1. Calcular distancia objetivo
+    // Convertir grados a radianes
+    float angulo_rad = angulo_grados * (M_PI / 180.0);
+    
+    // Calcular la distancia de arco que debe recorrer la RUEDA MÓVIL
+    // Radio (r) = DISTANCIA_ENTRE_RUEDAS_M
+    // Distancia (s) = r * angulo_rad
+    float distancia_obj = fabsf(angulo_rad * DISTANCIA_ENTRE_RUEDAS_M);
+
+    float distancia_recorrida = 0;
+    const int pwm_giro = 230; // Usamos un PWM constante
+
+    // Asegurar que esté detenido
+    Detener();
+    _delay_ms(200); 
+
+    // 2. Iniciar el giro en la dirección correcta
+    if (angulo_grados > 0) {
+        // Gira Izquierda: Pivote izquierdo, mueve rueda DERECHA
+        Avanzar(0, pwm_giro);
+    } else {
+        // Gira Derecha: Pivote derecho, mueve rueda IZQUIERDA
+        Avanzar(pwm_giro, 0);
+    }
+    _delay_ms(100); // Dar tiempo a que arranque
+    snprintf(buffer, sizeof(buffer),
+                 "distancia: %.3f  distancia objetivo: %.3f\n", distancia_recorrida, distancia_obj);
+    uart_print(buffer);
+    // 3. Bucle de control hasta alcanzar el ángulo
+    while (distancia_recorrida < distancia_obj) {
+        
+        float velocidad_movil;
+
+        // Leemos la velocidad SOLO de la rueda que se está moviendo
+        if (angulo_grados > 0) {
+            // Girando Izquierda, medimos rueda DERECHA
+            velocidad_movil = velocidad_der;
+        } else {
+            // Girando Derecha, medimos rueda IZQUIERDA
+            velocidad_movil = velocidad_izq;
+        }
+
+        // Calcular distancia recorrida (solo de la rueda que se mueve)
+        distancia_recorrida += velocidad_movil * TIEMPO_MUESTREO;
+        
+        // Esperar el tiempo de muestreo
+        _delay_ms((int)(TIEMPO_MUESTREO * 1000));
+
+        snprintf(buffer, sizeof(buffer),
+                 "distancia: %.3f  distancia objetivo: %.3f\n", distancia_recorrida, distancia_obj);
+        uart_print(buffer);
+        
+    }
+
+    // 4. Detener motores
+    Detener();
+    _delay_ms(200); // Pausa post-giro
 }

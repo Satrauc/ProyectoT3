@@ -16,3 +16,5 @@ void print();
 void AvanzarRecto(float distancia_cm); 
 
 void RetrocederRecto(float distancia_cm);
+
+void GirarSobreEje(float angulo_grados);

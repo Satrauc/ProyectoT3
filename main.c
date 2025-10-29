@@ -81,11 +81,15 @@ int main(void) {
 
         uart_receive_string(texto, sizeof(texto));
         if (texto[0] != '\0') {
-            AvanzarRecto(atof(texto));
+            GirarSobreEje(atof(texto));
+            //AvanzarRecto(atof(texto));
             _delay_ms(1000);
             
             memset(texto, 0, sizeof(texto));
         }
+        /*AvanzarRecto(20.0f);
+        _delay_ms(1000);*/
         Detener();
+        _delay_ms(5000);
     }
 }
