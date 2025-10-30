@@ -15,19 +15,19 @@ void motores_init(void) {
     DDRB |= (1 << D1_PIN) | (1 << D2_PIN) | (1 << D3_PIN) | (1 << VT_PIN);
 
     // Habilitar puente
-    PORTB |= (1 << VT_PIN);
+    //PORTB |= (1 << VT_PIN);
 
     // ---------- PWM Timer2 -> Motor Izquierdo ----------
     // OC2B = PH6 = Pin 9
     TCCR2A = (1 << COM2B1) | (1 << WGM21) | (1 << WGM20);  // Fast PWM 8-bit
     TCCR2B = (1 << CS21);   // Prescaler 8 → frecuencia PWM ≈ 3.9 kHz
-    OCR2B = 0;              
+    OCR2B = 0;           
 
     // ---------- PWM Timer1 -> Motor Derecho ----------
     // OC1A = PB5 (Pin 11)
     TCCR1A = (1 << COM1A1) | (1 << WGM10);  // Fast PWM 8-bit
     TCCR1B = (1 << WGM12) | (1 << CS11);    // Prescaler 8
-    OCR1A = 0;              
+    OCR1A = 0;           
 }
 
 // Avanzar: ambos motores adelante

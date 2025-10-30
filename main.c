@@ -69,6 +69,7 @@ int main(void) {
     Encoder_init();
     Timer3_init();
     motores_init();
+    Detener();
     sei();
 
      _delay_ms(1000);
@@ -78,18 +79,18 @@ int main(void) {
     char texto[50];
 
     while (1) {
-
-        uart_receive_string(texto, sizeof(texto));
+        /*uart_receive_string(texto, sizeof(texto));
         if (texto[0] != '\0') {
-            GirarSobreEje(atof(texto));
-            //AvanzarRecto(atof(texto));
+            //GirarSobreEje(atof(texto));
+            AvanzarRecto(atof(texto));
             _delay_ms(1000);
             
             memset(texto, 0, sizeof(texto));
-        }
-        /*AvanzarRecto(20.0f);
-        _delay_ms(1000);*/
+        }*/
+        AvanzarRecto(10);
+        _delay_ms(1000);
         Detener();
-        _delay_ms(5000);
+        _delay_ms(2000);
+    
     }
 }
