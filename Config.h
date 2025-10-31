@@ -30,9 +30,18 @@ extern float TR, TI, UR, UI, SR, SI;
 // =============================
 // CONFIGURACIONES DEL FC-03
 // =============================
-#define PULSOS_POR_REV 20
-#define RADIO_RUEDA 0.0664f 
-#define DISTANCIA_ENTRE_RUEDAS_M 0.098f
+#define PULSOS_POR_REV 79
+#define RADIO_RUEDA 66.4f //mm
+#define DISTANCIA_ENTRE_RUEDAS_M 98.0f //mm
+//#define PULSOS_POR_REV 20
+//#define RADIO_RUEDA 0.00664f //mm
+//#define DISTANCIA_ENTRE_RUEDAS_M 0.0098f //mm
+#define MAX_VEL_SEG_DER 1079.45f    // mm/s
+#define MAX_VEL_SEG_IZQ 907.81f     // mm/s
+#define MIM_VEL_SEG_DER 768.39f    // mm/s
+#define MIM_VEL_SEG_IZQ 589.89f     // mm/s
+#define PWM_MAX 220
+#define PWM_MIN 190
 
 
 volatile uint16_t contador_izq;       // Conteo total de pulsos
@@ -53,7 +62,7 @@ volatile uint8_t flag_nueva_muestra;
 
 // Movimiento recto
 #define TIEMPO_MUESTREO 0.01f 
-#define K_CORRECCION 2.5f 
+#define K_CORRECCION 100.0f 
 
 
 #endif // CONFIG_H

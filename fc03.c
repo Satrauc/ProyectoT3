@@ -2,7 +2,6 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <stdio.h>
-
 #include "config.h"
 #include "fc03.h"
 
@@ -34,27 +33,28 @@ void Encoder_init(void) {
 }
 
 // ==========================
-// Configuración del Timer3
+// Configuración del Timer4
 // ==========================
-void Timer3_init(void) {
-    // Modo CTC
-    TCCR3B |= (1 << WGM32);
-    OCR3A = 2499; // 0.01 s a 16 MHz con prescaler 1024
-    TIMSK3 |= (1 << OCIE3A);
-    TCCR3B |= (1 << CS32) | (1 << CS30); // prescaler 1024
+void Timer4_init(void) {
+    TCCR4A = 0;               // Limpia registros
+    TCCR4B = 0;
+    TCCR4B |= (1 << WGM42);   // Modo CTC
+    OCR4A = 2499;             // 0.01 s a 16 MHz con prescaler 64
+    TIMSK4 |= (1 << OCIE4A);  // Habilita interrupción por comparación
+    TCCR4B |= (1 << CS41) | (1 << CS40); // Prescaler 64
 }
 
 // ==========================
-// ISR del Timer3 (cada 1 segundo)
+// ISR del Timer4 
 // ==========================
-ISR(TIMER3_COMPA_vect) {
+ISR(TIMER4_COMPA_vect) {
     flag_nueva_muestra = 1;
 
     float rev_izq = (float)contador_izq / PULSOS_POR_REV;
     float rev_der = (float)contador_der / PULSOS_POR_REV;
 
-    velocidad_izq = 2.0f * 3.1416f * RADIO_RUEDA * rev_izq;
-    velocidad_der = 2.0f * 3.1416f * RADIO_RUEDA * rev_der;
+    velocidad_izq = 2.0f * M_PI * RADIO_RUEDA * rev_izq * 100; // mm/s
+    velocidad_der = 2.0f * M_PI * RADIO_RUEDA * rev_der * 100; // mm/s
 
     contador_izq = 0;
     contador_der = 0;

@@ -67,28 +67,25 @@ int main(void){
 int main(void) {
     uart_init(MYUBRR);
     Encoder_init();
-    Timer3_init();
+    Timer4_init();
     motores_init();
     Detener();
     sei();
 
      _delay_ms(1000);
-    
-   
-
     char texto[50];
 
     while (1) {
-        /*uart_receive_string(texto, sizeof(texto));
+        uart_receive_string(texto, sizeof(texto));
         if (texto[0] != '\0') {
             //GirarSobreEje(atof(texto));
             AvanzarRecto(atof(texto));
             _delay_ms(1000);
             
             memset(texto, 0, sizeof(texto));
-        }*/
-        AvanzarRecto(10);
-        _delay_ms(1000);
+        }
+        //AvanzarRecto(10);
+        //_delay_ms(1000);
         Detener();
         _delay_ms(2000);
     

@@ -59,54 +59,80 @@ void Detener(void) {
     OCR1A = 0;
 }
 
+float CalcularPWM_Der(float velocidad_mm_s) {
+    if (velocidad_mm_s <= MIM_VEL_SEG_DER)
+        return PWM_MIN;
+    else if (velocidad_mm_s >= MAX_VEL_SEG_DER)
+        return PWM_MAX;
+
+    // Regla de tres lineal
+    float pwm = PWM_MIN + 
+        ((velocidad_mm_s - MIM_VEL_SEG_DER) * (PWM_MAX - PWM_MIN)) /
+        (MAX_VEL_SEG_DER - MIM_VEL_SEG_DER);
+    return pwm;
+}
+
+float CalcularPWM_Izq(float velocidad_mm_s) {
+    if (velocidad_mm_s <= MIM_VEL_SEG_IZQ)
+        return PWM_MIN;
+    else if (velocidad_mm_s >= MAX_VEL_SEG_IZQ)
+        return PWM_MAX;
+
+    // Regla de tres lineal
+    float pwm = PWM_MIN + 
+        ((velocidad_mm_s - MIM_VEL_SEG_IZQ) * (PWM_MAX - PWM_MIN)) /
+        (MAX_VEL_SEG_IZQ - MIM_VEL_SEG_IZQ);
+    return pwm;
+}
+
 void AvanzarRecto(float distancia_cm) {
-    
-    float distancia_obj = distancia_cm / 100.0;  // pasar a metros
+
+    //float distancia_cm = 40.0;
+    float offset = 50.0;
+    float distancia_obj = distancia_cm * 10.0 + offset; 
     float distancia_recorrida = 0;
-    float pwm_der = 220;  // valor inicial de PWM
-    float pwm_izq = 220;
+    float pwm_der = PWM_MIN;  // valor inicial de PWM
+    float pwm_izq = PWM_MIN;
     flag_nueva_muestra = 0;  
     char buffer[128];
     Detener();
-    _delay_ms(200);
-
-    Avanzar((int)pwm_izq, (int)pwm_der);
-    //_delay_ms(200);  
+    _delay_ms(200); 
 
     while (distancia_recorrida < distancia_obj) {
         
 
         // Calcula diferencia de velocidades
-        float error = velocidad_der - velocidad_izq;
+        float error = CalcularPWM_Der(velocidad_der) - CalcularPWM_Izq(velocidad_izq);
 
         // Corrección proporcional
         pwm_der -= K_CORRECCION * error;
         pwm_izq += K_CORRECCION * error;
+        
+        /*pwm_der -= K * error;
+        pwm_izq += K * error;*/
 
         // Limitar valores PWM
-        if (pwm_der > 255) pwm_der = 255;
-        if (pwm_der < 0) pwm_der = 0;
-        if (pwm_izq > 255) pwm_izq = 255;
-        if (pwm_izq < 0) pwm_izq = 0;
+        if (pwm_der > PWM_MAX) pwm_der = PWM_MAX;
+        if (pwm_der < PWM_MIN) pwm_der = PWM_MIN;
+        if (pwm_izq > PWM_MAX) pwm_izq = PWM_MAX;
+        if (pwm_izq < PWM_MIN) pwm_izq = PWM_MIN;
 
         // Aplicar nueva velocidad
         Avanzar((int)pwm_izq, (int)pwm_der);
 
         // Calcular distancia recorrida aproximada (promedio)
-        float vel_prom = (velocidad_der + velocidad_izq) / 2.0;
+        float vel_prom = ((velocidad_der + velocidad_izq) / 2.0 );
         distancia_recorrida += vel_prom * TIEMPO_MUESTREO;
 
-        //while (!flag_nueva_muestra);  
-        //flag_nueva_muestra = 0;        // limpiar bandera
-
-        _delay_ms(5);
+        
         
         snprintf(buffer, sizeof(buffer),
-                 "distancia: %.3f \n", distancia_recorrida*100);
+                 "distancia: %.3f mm Valocidad: %.3f mm/s distancia objetivo: %.3f  mm \n", distancia_recorrida, vel_prom, distancia_obj);
         uart_print(buffer);
     }
 
     Detener();
+    _delay_ms(200); 
 }
 
 void RetrocederRecto(float distancia_cm) {

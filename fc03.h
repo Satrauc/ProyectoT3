@@ -9,4 +9,4 @@ void Encoder_init(void);
 	Para Inicializar el conteo												
 														 */
 ///////////////////////////////////////////////////////////
-void Timer3_init(void);
+void Timer4_init(void);

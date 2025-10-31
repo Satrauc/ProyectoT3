@@ -10,7 +10,9 @@ void Retroceder(uint8_t pwm_izq, uint8_t pwm_der);
 // Detener ambos motores
 void Detener(void);
 
-void print();
+float CalcularPWM_Der(float velocidad_mm_s) ;
+
+float CalcularPWM_Izq(float velocidad_mm_s) ;
 
 // Nivela los motores usando diferencial de velocidades
 void AvanzarRecto(float distancia_cm); 

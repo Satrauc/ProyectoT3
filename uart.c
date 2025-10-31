@@ -60,12 +60,12 @@ void uart_receive_string(char *buffer, uint8_t max_length) {
 ///////////////////////////////////////////////////////////
 void print(){
     char buffer[128];
-    /*snprintf(buffer, sizeof(buffer),
-                 "Izq: %u pulsos     Der: %u pulsos  \r\n",
-                 contador_izq, contador_der);*/
     snprintf(buffer, sizeof(buffer),
+                 "Izquierda: %u  Derecha: %u   \r\n",
+                 contador_izq, contador_der);
+    /*snprintf(buffer, sizeof(buffer),
                  "Vel Derecha: %.3f m/s     Vel Izquierda: %.3f m/s  \r\n",
-                 velocidad_der,  velocidad_izq);
+                 velocidad_der,  velocidad_izq);*/
 
     uart_print(buffer);
 }

@@ -6,6 +6,7 @@
         "fc03.h": "c",
         "stdio.h": "c",
         "signalprocessing.h": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "stdbool.h": "c"
     }
 }
